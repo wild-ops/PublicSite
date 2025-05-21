@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Infinite Ballerina Capuchina</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: scroll;
+      height: 100vh;
+      width: 100vw;
+      background: black;
+      color: white;
+      font-family: monospace;
+    }
+
+    #grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .chunk {
+      position: absolute;
+      white-space: pre-wrap;
+    }
+
+    #music-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: white;
+      color: black;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <button id="music-button">Play Music</button>
+  <div id="grid"></div>
+
+  <audio id="bg-music" loop>
+    <source src="https://cdn.pixabay.com/audio/2023/03/31/audio_4bcb3d7712.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const musicButton = document.getElementById("music-button");
+    const music = document.getElementById("bg-music");
+
+    const CHUNK_SIZE = 500;
+    const VIEW_RADIUS = 2;
+
+    const seenChunks = new Set();
+
+    function createChunk(x, y) {
+      const key = `${x},${y}`;
+      if (seenChunks.has(key)) return;
+      seenChunks.add(key);
+
+      const chunk = document.createElement("div");
+      chunk.className = "chunk";
+      chunk.style.left = `${x * CHUNK_SIZE}px`;
+      chunk.style.top = `${y * CHUNK_SIZE}px`;
+      chunk.style.width = `${CHUNK_SIZE}px`;
+      chunk.style.height = `${CHUNK_SIZE}px`;
+
+      const phrase = "ballerina capuchina ";
+      const repeatCount = 100;
+      chunk.textContent = phrase.repeat(repeatCount);
+
+      grid.appendChild(chunk);
+    }
+
+    function updateChunks() {
+      const scrollX = window.scrollX;
+      const scrollY = window.scrollY;
+      const centerX = Math.floor(scrollX / CHUNK_SIZE);
+      const centerY = Math.floor(scrollY / CHUNK_SIZE);
+
+      for (let dx = -VIEW_RADIUS; dx <= VIEW_RADIUS; dx++) {
+        for (let dy = -VIEW_RADIUS; dy <= VIEW_RADIUS; dy++) {
+          createChunk(centerX + dx, centerY + dy);
+        }
+      }
+
+      for (const child of Array.from(grid.children)) {
+        const x = parseInt(child.style.left, 10) / CHUNK_SIZE;
+        const y = parseInt(child.style.top, 10) / CHUNK_SIZE;
+        if (Math.abs(x - centerX) > VIEW_RADIUS || Math.abs(y - centerY) > VIEW_RADIUS) {
+          grid.removeChild(child);
+          seenChunks.delete(`${x},${y}`);
+        }
+      }
+    }
+
+    window.addEventListener("scroll", updateChunks);
+    window.addEventListener("resize", updateChunks);
+
+    window.scrollTo(500000, 500000);
+    updateChunks();
+
+    // Music button logic
+    musicButton.addEventListener("click", () => {
+      music.play();
+      musicButton.style.display = "none";
+    });
+  </script>
+</body>
+</html>
