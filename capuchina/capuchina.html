@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ballerina Capuchina</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: sans-serif;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="output">Loading...</div>
+
+  <script>
+    const repetitions = 1600000;
+    const phrase = "ballerina capuchina ";
+    const chunkSize = 10000; // render in chunks to avoid freezing
+
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerText = ''; // clear loading text
+
+    let i = 0;
+    function renderChunk() {
+      const chunk = phrase.repeat(Math.min(chunkSize, repetitions - i));
+      outputDiv.innerText += chunk;
+      i += chunkSize;
+      if (i < repetitions) {
+        setTimeout(renderChunk, 0); // yield to browser
+      }
+    }
+
+    renderChunk();
+  </script>
+</body>
+</html>
